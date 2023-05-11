@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import css from './modal.module.css';
 import PropTypes from 'prop-types';
@@ -7,10 +7,7 @@ const modalRoot = document.querySelector('#modal-root');
 
 function Modal({ children, onClose }) {
 
-        useEffect(() => {
-        window.addEventListener('keydown', handleKeyDown);
-        return removeEventListeners;
-    }, []);
+    window.addEventListener('keydown', handleKeyDown);
 
     function handleKeyDown(e) {
         if (e.code === 'Escape') {
@@ -24,9 +21,7 @@ function Modal({ children, onClose }) {
         }
     };
 
-    function removeEventListeners() {
-        window.removeEventListener('keydown', handleKeyDown);
-    }
+    // window.removeEventListener('keydown', handleKeyDown);
 
     return (
         createPortal(
