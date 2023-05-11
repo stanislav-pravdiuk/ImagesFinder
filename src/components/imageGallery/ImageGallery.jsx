@@ -1,70 +1,74 @@
-import React, { Component } from "react";
-import css from './image-gallery.module.css';
-import ImageGalleryItem from "./imageGalleryItem";
-import Loader from "../loader/Loader";
+import { useState, useEffect } from "react";
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import { fetchPix } from "services/pixApi";
+import css from './image-gallery.module.css';
 import Button from '../button/Button';
 import Modal from '../modal/Modal';
 import PropTypes from 'prop-types';
+import ImageGalleryItem from "./imageGalleryItem";
+import Loader from "../loader/Loader";
 
-class ImageGallery extends Component {
-    state = {
-        response: '',
-        error: null,
-        status: null,
-        showModal: false,
-        modalImg: '',
-        alt: '',
-        page: 1,
-    }
+function ImageGallery({ searchQuery }) {
 
-    componentDidUpdate(prevProps, prevState) {
-        const prevSearchQuery = prevProps.searchQuery;
-        const nextSearchQuery = this.props.searchQuery;
+    const [response, setResponse] = useState('');
+    const [error, setError] = useState(null);
+    const [status, setStatus] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [modalImg, setModalImg] = useState('');
+    const [alt, setAlt] = useState('');
+    const [page, setPage] = useState(1);
 
-        if (prevSearchQuery !== nextSearchQuery) {
-            
-            this.setState({ status: 'pending' });
-            
-            fetchPix(nextSearchQuery, 1)
-                .then(response => this.setState(prevState => {
-                    return {
-                        response: response.hits,
-                        status: 'resolved',
-                        page: prevState.page +1, 
-                    }
-                }))
-                .catch(error => this.setState({ error, status: 'rejected' }));
+    useEffect(() => {
+
+        if (searchQuery === '') {
+            return
         };
-    };
 
-    toggleModal = () => {
-        this.setState(state => ({
-            showModal: !state.showModal,
-        })); 
-    };
+        setStatus('pending');
 
-    getModalImg = (modalImg, alt) => {
-        this.setState({
-            modalImg,
-            alt,
-        })
-    };
+        fetchPix(searchQuery, 1)
+            .then(response => {
 
-    loadMore = () => {
-            fetchPix(this.props.searchQuery, this.state.page)
-            .then(nextResponse => this.setState(prevState => {
-                return {
-                    response: [...prevState.response, ...nextResponse.hits],
-                    page: prevState.page + 1,
+                if (response.total === 0) {
+                    Notify.warning('Nothing was found for your request');
+                    setStatus(null);
+                    return
                 }
-            })  
-            )
-            .catch(error => this.setState({ error, status: 'rejected' }));
+                setResponse(response.hits);
+                setStatus('resolved');
+                setPage(page + 1);
+                })
+            .catch(error => {
+                setError(error);
+                setStatus('rejected')
+                });
+
+    },[searchQuery]);
+
+    function toggleModal() {
+        setShowModal(!showModal); 
     };
 
-    render() {
-        const { response, error, status } = this.state;
+    function getModalImg(modalImg, alt) {
+        setModalImg(modalImg);
+        setAlt(alt);
+    };
+
+
+    function loadMore() {
+        
+        fetchPix(searchQuery, page)
+            .then(nextResponse => {
+                console.log('old', response);
+                console.log('new', nextResponse.hits);
+                setResponse([...response, ...nextResponse.hits]);
+                setPage(page + 1);
+            })
+            .catch(error => {
+                setError(error);
+                setStatus('rejected')
+                });
+    };
 
         if (status === 'pending') {
             return  <div className={css.box}>
@@ -81,8 +85,8 @@ class ImageGallery extends Component {
                         <ul className={css.imageGallery}>
                             {response.map(pix =>
                                 <ImageGalleryItem
-                                    onGetModalImg={this.getModalImg}
-                                    toggleModal={this.toggleModal}
+                                    onGetModalImg={getModalImg}
+                                    toggleModal={toggleModal}
                                     key={pix.id}
                                     pix={pix}
                                 />
@@ -91,23 +95,20 @@ class ImageGallery extends Component {
                 
                         <div className={css.box}>       
                         <Button
-                            onClick={this.loadMore}
+                            onClick={loadMore}
                                 >More
                         </Button>
                         </div>
                 
-                        {this.state.showModal &&
+                        {showModal &&
                             <Modal
-                                onClose={this.toggleModal}>
+                                onClose={toggleModal}>
                                     <img
-                                        src={this.state.modalImg}
-                                        alt={this.state.alt}
+                                        src={modalImg}
+                                        alt={alt}
                                     />
                             </Modal>}
                     </div>
-                
-        
-        };
 };
 
 ImageGallery.propTypes = {

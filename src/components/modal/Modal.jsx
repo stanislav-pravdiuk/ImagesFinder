@@ -1,51 +1,50 @@
-import React, { Component } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import css from './modal.module.css';
 import PropTypes from 'prop-types';
 
 const modalRoot = document.querySelector('#modal-root');
 
-class Modal extends Component {
+function Modal({ children, onClose }) {
 
-    componentDidMount() {
-        window.addEventListener('keydown', this.handleKeyDown)
-    };
+        useEffect(() => {
+        window.addEventListener('keydown', handleKeyDown);
+        return removeEventListeners;
+    }, []);
 
-    componentWillUnmount() {
-        window.removeEventListener('keydown', this.handleKeyDown)
-    };
-
-    handleKeyDown = e => {
+    function handleKeyDown(e) {
         if (e.code === 'Escape') {
-            this.props.onClose();
+            onClose();
+        };
+    };
+
+    function handleBackdropClick(e) {
+        if (e.target === e.currentTarget) {
+            onClose();
         }
     };
 
-    handleBackdropClick = e => {
-        if (e.target === e.currentTarget) {
-            this.props.onClose();
-        }
+    function removeEventListeners() {
+        window.removeEventListener('keydown', handleKeyDown);
     }
 
-    render() {
-        return (
-            createPortal(
-                <div
-                    className={css.overlay}
-                    onClick={this.handleBackdropClick}>
-                    <div className={css.modal}>
-                        {this.props.children}
-                    </div>
-                </div>,
-                modalRoot
-            )
-        )
-    }
+    return (
+        createPortal(
+            <div 
+                className={css.overlay}
+                onClick={handleBackdropClick}>
     
+                <div className={css.modal}>
+                    {children}
+                </div>
+            </div>,
+            modalRoot
+        )
+    );    
 };
 
 Modal.propTypes = {
-    Children: PropTypes.node,
+    children: PropTypes.node,
     onClose: PropTypes.func.isRequired
 };
 
