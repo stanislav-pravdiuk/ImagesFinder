@@ -1,27 +1,24 @@
 import css from './image-gallery.module.css';
-import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-class ImageGalleryItem extends Component {
+function ImageGalleryItem({ pix, toggleModal, onGetModalImg }) {
 
-    onClick = () => {
-        this.props.onGetModalImg(this.props.pix.largeImageURL, this.props.pix.tags);
-        this.props.toggleModal();
+    function onClick() {
+        onGetModalImg(pix.largeImageURL, pix.tags);
+        toggleModal();
     };
 
-    render() { 
-        return (
+    return (
         <li
             className={css.imageGallery__item}>
             <img
-                onClick={this.onClick}    
+                onClick={onClick}    
                 className={css.imageGalleryItem__image}
-                src={this.props.pix.webformatURL}
-                alt={this.props.pix.tags}
+                src={pix.webformatURL}
+                alt={pix.tags}
             />
         </li>
     )
-    }
 };
 
 ImageGalleryItem.propTypes = {
