@@ -36,7 +36,7 @@ function ImageGallery({ searchQuery }) {
                 }
                 setResponse(response.hits);
                 setStatus('resolved');
-                setPage(page + 1);
+                setPage(state => state + 1);
                 })
             .catch(error => {
                 setError(error);
@@ -62,7 +62,7 @@ function ImageGallery({ searchQuery }) {
                 console.log('old', response);
                 console.log('new', nextResponse.hits);
                 setResponse([...response, ...nextResponse.hits]);
-                setPage(page + 1);
+                setPage(state => state + 1);
             })
             .catch(error => {
                 setError(error);
