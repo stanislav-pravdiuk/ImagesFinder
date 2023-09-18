@@ -1,1 +1,1 @@
-![Hook](./assets/hooks-banner.jpg)
+![Hook](./assets/preview.jpg)
