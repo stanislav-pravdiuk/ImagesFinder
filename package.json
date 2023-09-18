@@ -1,8 +1,8 @@
 {
-  "name": "goit-react-hw-04-images",
+  "name": "images-finder",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://stanislav-pravdiuk.github.io/goit-react-hw-04-images/",
+  "homepage": "https://stanislav-pravdiuk.github.io/ImagesFinder/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^12.1.4",
